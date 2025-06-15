@@ -1,0 +1,121 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html {
+    font-family: 'Inter', system-ui, sans-serif;
+  }
+  
+  body {
+    @apply bg-gray-50 text-gray-900;
+  }
+}
+
+@layer components {
+  .exam-container {
+    @apply max-w-7xl mx-auto px-4;
+  }
+  
+  .question-card {
+    @apply bg-white rounded-xl shadow-sm p-6 mb-6;
+  }
+  
+  .option-button {
+    @apply flex items-center p-4 border rounded-lg cursor-pointer transition-all duration-200;
+  }
+  
+  .option-button:hover {
+    @apply border-gray-300 bg-gray-50;
+  }
+  
+  .option-selected {
+    @apply border-blue-500 bg-blue-50;
+  }
+  
+  .question-nav-btn {
+    @apply w-10 h-10 rounded-lg font-medium text-sm transition-colors;
+  }
+  
+  .btn-primary {
+    @apply bg-blue-500 hover:bg-blue-600 text-white font-medium py-2 px-4 rounded-lg transition-colors;
+  }
+  
+  .btn-secondary {
+    @apply bg-gray-200 hover:bg-gray-300 text-gray-700 font-medium py-2 px-4 rounded-lg transition-colors;
+  }
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: #f1f1f1;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #c1c1c1;
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #a1a1a1;
+}
+
+/* Prevent text selection during exam */
+.exam-mode {
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+}
+
+/* Disable drag and drop */
+.exam-mode * {
+  -webkit-user-drag: none;
+  -khtml-user-drag: none;
+  -moz-user-drag: none;
+  -o-user-drag: none;
+  user-drag: none;
+}
+
+/* Print styles */
+@media print {
+  .no-print {
+    display: none !important;
+  }
+  
+  body {
+    background: white !important;
+    color: black !important;
+  }
+  
+  .bg-gradient-to-r {
+    background: #f8f9fa !important;
+    color: black !important;
+  }
+}
+
+/* Animation for violations */
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  25% { transform: translateX(-5px); }
+  75% { transform: translateX(5px); }
+}
+
+.violation-shake {
+  animation: shake 0.5s ease-in-out;
+}
+
+/* Fullscreen exam mode */
+.exam-fullscreen {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  z-index: 9999;
+  background: white;
+}
