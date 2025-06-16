@@ -27,7 +27,9 @@ export const useTimer = (initialTime, onTimeUp) => {
   useEffect(() => {
     if (isRunning && timeLeft > 0) {
       intervalRef.current = setInterval(() => {
+        console.log("Current timeLeft (before update):", timeLeft);
         setTimeLeft((prev) => {
+          console.log("Previous timeLeft (inside setTimeLeft):", prev);
           if (prev <= 1) {
             onTimeUp();
             return 0;
@@ -60,6 +62,6 @@ export const useTimer = (initialTime, onTimeUp) => {
     startTimer,
     stopTimer,
     resetTimer,
-    formatTime: formatTime(timeLeft)
+    formatTime
   };
 };

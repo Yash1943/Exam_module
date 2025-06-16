@@ -53,15 +53,15 @@ const ExamResults = ({ onRestart }) => {
               )}
             </div>
             <h1 className="text-3xl font-bold text-gray-900 mb-2">
-              {results.passed ? 'Congratulations!' : 'Exam Completed'}
+              {results.passed ? 'Exam Completed!' : 'Exam Completed!'}
             </h1>
-            <p className="text-gray-600">
+            {/* <p className="text-gray-600">
               {results.passed ? 'You have successfully passed the exam!' : 'You need to score at least 60% to pass.'}
-            </p>
+            </p> */}
           </div>
 
           {/* Score Card */}
-          <div className="bg-gradient-to-r from-blue-500 to-purple-600 rounded-xl p-6 text-white mb-8">
+          {/* <div className="bg-gradient-to-r from-blue-500 to-purple-600 rounded-xl p-6 text-white mb-8">
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-center">
               <div>
                 <div className="text-3xl font-bold mb-1">{results.percentage}%</div>
@@ -80,10 +80,10 @@ const ExamResults = ({ onRestart }) => {
                 <div className="text-blue-100">Time Spent</div>
               </div>
             </div>
-          </div>
+          </div> */}
 
           {/* Detailed Results */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+          {/* <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
             <div className="bg-gray-50 rounded-xl p-6">
               <h3 className="font-semibold text-gray-900 mb-4">Performance Summary</h3>
               <div className="space-y-3">
@@ -94,6 +94,10 @@ const ExamResults = ({ onRestart }) => {
                 <div className="flex justify-between items-center">
                   <span className="text-gray-600">Attempted</span>
                   <span className="font-medium text-blue-600">{results.attempted}</span>
+                </div>
+                <div className="flex justify-between items-center">
+                  <span className="text-gray-600">Answered Questions</span>
+                  <span className="font-medium text-blue-600">{results.attempted || 0}</span>
                 </div>
                 <div className="flex justify-between items-center">
                   <span className="text-gray-600">Correct Answers</span>
@@ -140,10 +144,10 @@ const ExamResults = ({ onRestart }) => {
                 )}
               </div>
             </div>
-          </div>
+          </div> */}
 
           {/* Progress Bar */}
-          <div className="mb-8">
+          {/* <div className="mb-8">
             <div className="flex justify-between items-center mb-2">
               <span className="text-sm font-medium text-gray-700">Accuracy Rate</span>
               <span className="text-sm font-medium text-gray-700">{results.percentage}%</span>
@@ -156,10 +160,10 @@ const ExamResults = ({ onRestart }) => {
                 style={{ width: `${Math.min(results.percentage, 100)}%` }}
               ></div>
             </div>
-          </div>
+          </div> */}
 
           {/* Actions */}
-          <div className="text-center space-y-4">
+          {/* <div className="text-center space-y-4">
             {!results.passed && (
               <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4 mb-4">
                 <p className="text-yellow-800">
@@ -184,7 +188,7 @@ const ExamResults = ({ onRestart }) => {
                 Print Results
               </button>
             </div>
-          </div>
+          </div> */}
         </div>
       </div>
     </div>
