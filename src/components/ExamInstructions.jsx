@@ -17,7 +17,7 @@ const ExamInstructions = () => {
   const[iscompletedexam , setiscompletedexam] = useState('')
 
   const formatTime = (time_of_exam) => {
-    console.log("Raw time_of_exam value:", time_of_exam);
+    // console.log("Raw time_of_exam value:", time_of_exam);
     
     if (!time_of_exam) return '0 minutes';
     
@@ -58,7 +58,7 @@ const ExamInstructions = () => {
 
   useEffect(() => {
     if (userData) {
-      console.log("userData", userData);
+      // console.log("userData", userData);
       setcetegorystate(userData.applied_position_preference);
       setusername(userData.name);
     }
@@ -68,12 +68,12 @@ const ExamInstructions = () => {
     const fetchExamInfo = async () => {
       if (cetegorystate) {
         try {
-          console.log("username",username)
+          // console.log("username",username)
           const get_is_completed_exam = await get_is_exam_completed(username)
-          console.log("get_is_completed_exam",get_is_completed_exam.data.message)
+          // console.log("get_is_completed_exam",get_is_completed_exam.data.message)
           setiscompletedexam(get_is_completed_exam.data.message)
           const get_exam_info = await get_exam_apptitude_info(cetegorystate);
-          console.log("get_exam_info", get_exam_info);
+          // console.log("get_exam_info", get_exam_info);
           setminimummarks(get_exam_info.data.message[0].minimum_passing_score);
           settime_of_exam(get_exam_info.data.message[0].time_of_exam);
           set_total_marks(get_exam_info.data.message[0].total_marks);

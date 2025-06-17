@@ -10,9 +10,6 @@ const ExamInterface = ({ onExamComplete }) => {
   const location = useLocation();
   const navigate = useNavigate();
   const { studentInfo, examInfo, timeOfExam, totalMarks } = location.state || {};
-
-  console.log("timeOfExam from location.state:", examInfo);
-
   // Add fullscreen functionality
   useEffect(() => {
     const enableFullScreen = async () => {
@@ -83,7 +80,7 @@ const ExamInterface = ({ onExamComplete }) => {
 
   // Helper to format time for display
   const formatExamTime = (time_of_exam) => {
-    console.log("Raw time_of_exam value:", time_of_exam);
+    // console.log("Raw time_of_exam value:", time_of_exam);
 
     if (!time_of_exam) return "0 minutes";
 
@@ -122,8 +119,8 @@ const ExamInterface = ({ onExamComplete }) => {
 
   const initialTimeInSeconds = parseTime(timeOfExam);
 
-  console.log("timeOfExam",timeOfExam)
-  console.log("initialTimeInSeconds",initialTimeInSeconds)
+  // console.log("timeOfExam",timeOfExam)
+  // console.log("initialTimeInSeconds",initialTimeInSeconds)
 
   const [questions, setQuestions] = useState([]);
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
@@ -189,18 +186,19 @@ const ExamInterface = ({ onExamComplete }) => {
           // Determine which parameter to pass based on category
           const categoryParam = examInfo.data.message[0].category === "Software Developer" ? 1 : 2;
           const fetchedQuestions = await get_exam_apptitude_questions(categoryParam);
-          console.log("fetchedQuestions", fetchedQuestions.data.message);
+          // console.log("fetchedQuestions", fetchedQuestions.data.message);
 
           const parsedQuestions = fetchedQuestions.data.message.map((q) => ({
             ...q,
             option: JSON.parse(q.option),
             answer: JSON.parse(q.answer),
             id: q.id || Math.random().toString(36).substr(2, 9), // Ensure each question has a unique ID
+            marks: q.marks || 1, // Add marks field, default to 1 if not provided
           }));
 
           // Shuffle the questions
           const shuffledQuestions = parsedQuestions.sort(() => Math.random() - 0.5);
-          console.log("shuffledQuestions",shuffledQuestions)
+          // console.log("shuffledQuestions",shuffledQuestions)
 
           setQuestions(shuffledQuestions);
           // Initialize selectedAnswers with empty values for each question
@@ -227,7 +225,7 @@ const ExamInterface = ({ onExamComplete }) => {
   }, [studentInfo, navigate]);
 
   const handleOptionSelect = (questionId, value) => {
-    console.log("Selecting answer:", { questionId, value });
+    // console.log("Selecting answer:", { questionId, value });
     setSelectedAnswers((prev) => {
       const newAnswers = { ...prev };
       newAnswers[questionId] = value;
@@ -250,7 +248,7 @@ const ExamInterface = ({ onExamComplete }) => {
   const submitExam = async () => {
     const results = calculateResults();
     const timeSpent = initialTimeInSeconds - timeLeft;
-    console.log("studentInfo", studentInfo);
+    // console.log("studentInfo", studentInfo);
     const username = studentInfo.name;
     const exam_type = studentInfo.applied_position_preference;
     //    {
@@ -266,7 +264,7 @@ const ExamInterface = ({ onExamComplete }) => {
     //     "email_id": "yash@sd.com",
     //     "semester": "VII"
     // }
-    console.log("results", results); //{
+    // console.log("results", results); //{
     //     "totalQuestions": 4,
     //     "attempted": 4,
     //     "correct": 3,
@@ -471,6 +469,9 @@ const ExamInterface = ({ onExamComplete }) => {
                 </h2>
                 <div className="flex items-center space-x-2">
                   <span className="text-sm text-gray-500">{currentQ.subject}</span>
+                  <span className="text-sm font-medium text-blue-600">
+                    Marks: {currentQ.marks}
+                  </span>
                   <span
                     className={`px-2 py-1 rounded text-xs font-medium ${
                       currentQ.question_leval === "Easy"
