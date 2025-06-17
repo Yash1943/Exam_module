@@ -315,7 +315,9 @@ const Signup = () => {
         sanitizedData.password
       );
 
-      if (response.status === "success") {
+      console.log("response in the signin",response)
+
+      if (response.success && response.data.message.status === "success") {
         setSuccess('Registration successful! Welcome aboard!');
         // Reset form
         setFormData({
@@ -333,8 +335,33 @@ const Signup = () => {
         });
         setTouchedFields({});
         setErrors({});
+      } else if (response.success && response.data.message.status === "error") {
+        // Parse the server message if available
+        let errorMessage = 'Registration failed. Please try again.';
+        let technicalError = '';
+        
+        if (response._server_messages) {
+          try {
+            const serverMessages = JSON.parse(response._server_messages);
+            if (serverMessages && serverMessages[0]) {
+              const parsedMessage = JSON.parse(serverMessages[0]);
+              errorMessage = parsedMessage.message || errorMessage;
+            }
+          } catch (e) {
+            console.error('Error parsing server messages:', e);
+          }
+        }
+        
+        // Get technical error message
+        if (response.data.message.message) {
+          technicalError = response.data.message.message;
+        }
+        
+        setErrors({ 
+          submit: `${errorMessage}${technicalError ? ` (${technicalError})` : ''}`
+        });
       } else {
-        setErrors({ submit: response.message || 'Registration failed. Please try again.' });
+        setErrors({ submit: 'Registration failed. Please try again.' });
       }
     } catch (err) {
       console.error('Signup error:', err);

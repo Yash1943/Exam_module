@@ -11,28 +11,35 @@ const LoginForm = () => {
     studentId: '',
     password: ''
   });
+  const [error, setError] = useState('');
 
-  console.log("credentials",credentials)
+  // console.log("credentials",credentials)
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setError(''); // Clear any previous errors
     if (credentials.studentId && credentials.password) {
       console.log("inside the handlesubmit")
 
       try {
         const signin_exam = await check_signin_apptitude_exam(credentials.studentId, credentials.password);
-        console.log(signin_exam);
-        if (signin_exam.success && signin_exam.data.message.response.length > 0) {
+        console.log("signin_exam",signin_exam.data.message.response.length);
+        if (signin_exam.data.message.status == "success" && signin_exam.data.message.response.length > 0) {
+          console.log("inside the if");
+          
           // Store user data in auth context
           login({
             studentId: credentials.studentId,
             ...signin_exam.data.message.response[0]
           });
           navigate('/instructions');
+        }else{
+          setError('Invalid Aadhar Card No or password');
         }
       }
       catch (error) {
         console.log("getting error", error);
+        setError('An error occurred. Please try again.');
       }
     }
   };
@@ -95,6 +102,12 @@ const LoginForm = () => {
               />
             </div>
           </div>
+
+          {error && (
+            <div className="text-red-500 text-sm mt-2">
+              {error}
+            </div>
+          )}
 
           <button
             type="submit"
