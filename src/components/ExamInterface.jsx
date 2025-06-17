@@ -294,7 +294,7 @@ const ExamInterface = ({ onExamComplete }) => {
       };
     });
 
-    console.log("participant_evaluation", participant_evaluation);
+    // console.log("participant_evaluation", participant_evaluation);
 
     const parrticipant_score_save = await makePostApiCall(
       "samcore.samcore_api.save_apptitude_evalution",
@@ -306,7 +306,7 @@ const ExamInterface = ({ onExamComplete }) => {
       }
     );
 
-    console.log("parrticipant_score_save", parrticipant_score_save);
+    // console.log("parrticipant_score_save", parrticipant_score_save);
 
     console.log("Exam Results:", {
       results,
