@@ -1,5 +1,6 @@
 import React, { useEffect, useState, useCallback, useMemo } from 'react';
 import {save_signup_data , get_position_preffrence} from '../api/signup_and_signin'
+import { useNavigate } from 'react-router-dom';
 
 // Mock API functions for demonstration
 // const save_signup_data = async (...args) => {
@@ -122,6 +123,7 @@ const Signup = () => {
   const [preferences, setPreferences] = useState([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [loading, setLoading] = useState(true);
+  const navigate = useNavigate();
 
   // Fetch preferences on mount
   useEffect(() => {
@@ -318,23 +320,8 @@ const Signup = () => {
       console.log("response in the signin",response)
 
       if (response.success && response.data.message.status === "success") {
-        setSuccess('Registration successful! Welcome aboard!');
-        // Reset form
-        setFormData({
-          full_name: '',
-          college_name: '',
-          branch: '',
-          aadhar_card_no: '',
-          applied_position_preference: '',
-          prn_no: '',
-          phone_no: '',
-          email_id: '',
-          semester: '',
-          password: '',
-          confirm_password: ''
-        });
-        setTouchedFields({});
-        setErrors({});
+        // Set success message and redirect to login page
+        navigate('/', { state: { registrationSuccess: 'Registration successful! Welcome aboard!' } });
       } else if (response.success && response.data.message.status === "error") {
         // Parse the server message if available
         let errorMessage = 'Registration failed. Please try again.';
@@ -387,7 +374,7 @@ const Signup = () => {
       <div className="max-w-4xl mx-auto">
         <div className="bg-white rounded-2xl shadow-xl overflow-hidden">
           {/* Header */}
-          <div className="bg-blue-500 hover:bg-blue-600 text-white px-6 py-8 sm:px-8">
+          <div className="bg-[#1c2e4a] hover:bg-[#1c2e4a] text-white px-6 py-8 sm:px-8">
             <div className="text-center">
               <h2 className="text-3xl font-bold text-white sm:text-4xl">
                 Create Account
@@ -605,7 +592,7 @@ const Signup = () => {
                 className={`w-full md:w-auto md:min-w-[200px] flex justify-center items-center py-3 px-6 border border-transparent text-base font-medium rounded-lg text-white transition-all duration-200 ${
                   isSubmitting || Object.keys(errors).length > 0
                     ? 'bg-gray-400 cursor-not-allowed' 
-                    : 'bg-blue-500 hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transform hover:scale-105'
+                    : 'bg-[#1c2e4a] hover:bg-[#1c2e4a] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transform hover:scale-105'
                 }`}
               >
                 {isSubmitting ? (

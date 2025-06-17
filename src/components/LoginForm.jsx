@@ -1,17 +1,28 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { User, Lock, BookOpen } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { check_signin_apptitude_exam } from '../api/signup_and_signin';
 import { useAuth } from '../context/AuthContext';
+import SamarthLogo from '../assets/SD_Technoverse_JPG_copy.jpg';
 
 const LoginForm = () => {
   const navigate = useNavigate();
+  const location = useLocation();
   const { login } = useAuth();
   const [credentials, setCredentials] = useState({
     studentId: '',
     password: ''
   });
   const [error, setError] = useState('');
+  const [successMessage, setSuccessMessage] = useState('');
+
+  useEffect(() => {
+    if (location.state && location.state.registrationSuccess) {
+      setSuccessMessage(location.state.registrationSuccess);
+      // Clear the state so the message doesn't reappear on subsequent visits
+      navigate(location.pathname, { replace: true, state: {} });
+    }
+  }, [location, navigate]);
 
   // console.log("credentials",credentials)
 
@@ -59,12 +70,17 @@ const LoginForm = () => {
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center px-4">
       <div className="max-w-md w-full bg-white rounded-xl shadow-2xl p-8">
         <div className="text-center mb-8">
-          <div className="mx-auto w-16 h-16 bg-blue-500 rounded-full flex items-center justify-center mb-4">
-            <BookOpen className="w-8 h-8 text-white" />
-          </div>
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">MCQ Exam System</h1>
+          <img src={SamarthLogo} alt="Samarth Technoverse Logo" className="mx-auto w-64 mb-4" />
+          <h1 className="text-3xl font-bold text-gray-900 mb-2">Apptitude Exam System</h1>
           <p className="text-gray-600">Please login to start your exam</p>
         </div>
+
+        {successMessage && (
+          <div className="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded relative mb-6" role="alert">
+            <strong className="font-bold">Success!</strong>
+            <span className="block sm:inline"> {successMessage}</span>
+          </div>
+        )}
 
         <form onSubmit={handleSubmit} className="space-y-6">
           <div>
@@ -111,7 +127,7 @@ const LoginForm = () => {
 
           <button
             type="submit"
-            className="w-full bg-blue-500 hover:bg-blue-600 text-white font-semibold py-3 px-4 rounded-lg transition-colors focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+            className="w-full bg-[#1c2e4a] hover:bg-[#1c2e4a] text-white font-semibold py-3 px-4 rounded-lg transition-colors focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
           >
             Login to Exam
           </button>

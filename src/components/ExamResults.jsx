@@ -10,8 +10,28 @@ const ExamResults = ({ onRestart }) => {
   useEffect(() => {
     // If examData or results is null, redirect to instructions
     if (!examData || !examData.results) {
-      navigate('/instructions');
+      navigate('/');
     }
+
+    // Prevent browser back navigation
+    const handlePopState = (event) => {
+      event.preventDefault();
+      // Replace the current history entry with the exam results
+      window.history.pushState(null, '', window.location.href);
+      // Show a message to the user
+      // alert('Please use the "Take Another Exam" button to restart the exam.');
+    };
+
+    // Add event listener for popstate
+    window.addEventListener('popstate', handlePopState);
+
+    // Push a new history entry to prevent immediate back navigation
+    window.history.pushState(null, '', window.location.href);
+
+    // Cleanup function
+    return () => {
+      window.removeEventListener('popstate', handlePopState);
+    };
   }, [examData, navigate]);
 
   // Render nothing if examData or results is null to prevent further errors while redirecting
@@ -55,9 +75,6 @@ const ExamResults = ({ onRestart }) => {
             <h1 className="text-3xl font-bold text-gray-900 mb-2">
               {results.passed ? 'Exam Completed!' : 'Exam Completed!'}
             </h1>
-            {/* <p className="text-gray-600">
-              {results.passed ? 'You have successfully passed the exam!' : 'You need to score at least 60% to pass.'}
-            </p> */}
           </div>
 
           {/* Score Card */}
@@ -79,86 +96,6 @@ const ExamResults = ({ onRestart }) => {
                 <div className="text-3xl font-bold mb-1">{formatTime(timeSpent)}</div>
                 <div className="text-blue-100">Time Spent</div>
               </div>
-            </div>
-          </div> */}
-
-          {/* Detailed Results */}
-          {/* <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
-            <div className="bg-gray-50 rounded-xl p-6">
-              <h3 className="font-semibold text-gray-900 mb-4">Performance Summary</h3>
-              <div className="space-y-3">
-                <div className="flex justify-between items-center">
-                  <span className="text-gray-600">Total Questions</span>
-                  <span className="font-medium">{results.totalQuestions}</span>
-                </div>
-                <div className="flex justify-between items-center">
-                  <span className="text-gray-600">Attempted</span>
-                  <span className="font-medium text-blue-600">{results.attempted}</span>
-                </div>
-                <div className="flex justify-between items-center">
-                  <span className="text-gray-600">Answered Questions</span>
-                  <span className="font-medium text-blue-600">{results.attempted || 0}</span>
-                </div>
-                <div className="flex justify-between items-center">
-                  <span className="text-gray-600">Correct Answers</span>
-                  <span className="font-medium text-green-600">{results.correct}</span>
-                </div>
-                <div className="flex justify-between items-center">
-                  <span className="text-gray-600">Incorrect Answers</span>
-                  <span className="font-medium text-red-600">{results.incorrect}</span>
-                </div>
-                <div className="flex justify-between items-center">
-                  <span className="text-gray-600">Unanswered</span>
-                  <span className="font-medium text-gray-500">{results.unanswered}</span>
-                </div>
-              </div>
-            </div>
-
-            <div className="bg-gray-50 rounded-xl p-6">
-              <h3 className="font-semibold text-gray-900 mb-4">Exam Information</h3>
-              <div className="space-y-3">
-                <div className="flex justify-between items-center">
-                  <span className="text-gray-600">Student ID</span>
-                  <span className="font-medium">{studentInfo.studentId}</span>
-                </div>
-                <div className="flex justify-between items-center">
-                  <span className="text-gray-600">Exam Date</span>
-                  <span className="font-medium">{new Date().toLocaleDateString()}</span>
-                </div>
-                <div className="flex justify-between items-center">
-                  <span className="text-gray-600">Time Spent</span>
-                  <span className="font-medium">{formatTime(timeSpent)}</span>
-                </div>
-                <div className="flex justify-between items-center">
-                  <span className="text-gray-600">Passing Score</span>
-                  <span className="font-medium">60%</span>
-                </div>
-                {violationCount > 0 && (
-                  <div className="flex justify-between items-center">
-                    <span className="text-gray-600">Security Violations</span>
-                    <span className="font-medium text-red-600 flex items-center">
-                      <AlertTriangle className="w-4 h-4 mr-1" />
-                      {violationCount}
-                    </span>
-                  </div>
-                )}
-              </div>
-            </div>
-          </div> */}
-
-          {/* Progress Bar */}
-          {/* <div className="mb-8">
-            <div className="flex justify-between items-center mb-2">
-              <span className="text-sm font-medium text-gray-700">Accuracy Rate</span>
-              <span className="text-sm font-medium text-gray-700">{results.percentage}%</span>
-            </div>
-            <div className="w-full bg-gray-200 rounded-full h-3">
-              <div
-                className={`h-3 rounded-full transition-all duration-1000 ${
-                  results.percentage >= 60 ? 'bg-green-500' : 'bg-red-500'
-                }`}
-                style={{ width: `${Math.min(results.percentage, 100)}%` }}
-              ></div>
             </div>
           </div> */}
 

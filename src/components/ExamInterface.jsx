@@ -6,10 +6,40 @@ import { useLocation, useNavigate } from "react-router-dom";
 import { get_exam_apptitude_questions, save_apptitude_evalution } from "../api/get_question";
 import { makePostApiCall } from "../api/makeapicall";
 
+// Add styles for question formatting
+const questionStyles = `
+  .ql-editor {
+    padding: 0;
+    font-family: inherit;
+  }
+  .ql-editor p {
+    margin: 0;
+    padding: 0;
+  }
+  .ql-editor.read-mode {
+    background: transparent;
+    border: none;
+  }
+  .ql-editor pre {
+    background-color: #f3f4f6;
+    border-radius: 0.375rem;
+    padding: 1rem;
+    margin: 0.5rem 0;
+  }
+  .ql-editor code {
+    background-color: #f3f4f6;
+    padding: 0.2rem 0.4rem;
+    border-radius: 0.25rem;
+    font-family: monospace;
+  }
+`;
+
 const ExamInterface = ({ onExamComplete }) => {
   const location = useLocation();
   const navigate = useNavigate();
   const { studentInfo, examInfo, timeOfExam, totalMarks } = location.state || {};
+
+  // console.log("examInfo",examInfo)
   // Add fullscreen functionality
   useEffect(() => {
     const enableFullScreen = async () => {
@@ -186,7 +216,7 @@ const ExamInterface = ({ onExamComplete }) => {
           // Determine which parameter to pass based on category
           const categoryParam = examInfo.data.message[0].category === "Software Developer" ? 1 : 2;
           const fetchedQuestions = await get_exam_apptitude_questions(categoryParam);
-          console.log("fetchedQuestions", fetchedQuestions.data.message);
+          // console.log("fetchedQuestions", fetchedQuestions.data.message);
 
           const parsedQuestions = fetchedQuestions.data.message.map((q) => {
             try {
@@ -440,6 +470,7 @@ const ExamInterface = ({ onExamComplete }) => {
 
   return (
     <div className="fixed inset-0 bg-gray-50 overflow-auto">
+      <style>{questionStyles}</style>
       {/* Header */}
       <div className="bg-white shadow-sm border-b sticky top-0 z-10">
         <div className="max-w-7xl mx-auto px-4 py-4">
@@ -518,7 +549,10 @@ const ExamInterface = ({ onExamComplete }) => {
               </div>
 
               <div className="mb-6">
-                <p className="text-lg text-gray-900 leading-relaxed">{currentQ.question}</p>
+                <div 
+                  className="ql-editor read-mode text-lg text-gray-900 leading-relaxed"
+                  dangerouslySetInnerHTML={{ __html: currentQ.question }}
+                />
               </div>
 
               <div className="space-y-3 mb-6">

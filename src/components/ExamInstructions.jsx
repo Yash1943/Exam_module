@@ -70,10 +70,10 @@ const ExamInstructions = () => {
         try {
           // console.log("username",username)
           const get_is_completed_exam = await get_is_exam_completed(username)
-          // console.log("get_is_completed_exam",get_is_completed_exam.data.message)
-          setiscompletedexam(get_is_completed_exam.data.message)
+          console.log("get_is_completed_exam",get_is_completed_exam.data.message)
+          setiscompletedexam(get_is_completed_exam.data.message[0])
           const get_exam_info = await get_exam_apptitude_info(cetegorystate);
-          // console.log("get_exam_info", get_exam_info);
+          console.log("get_exam_info", get_exam_info);
           setminimummarks(get_exam_info.data.message[0].minimum_passing_score);
           settime_of_exam(get_exam_info.data.message[0].time_of_exam);
           set_total_marks(get_exam_info.data.message[0].total_marks);
@@ -120,7 +120,7 @@ const ExamInstructions = () => {
             <div className="bg-white rounded-xl shadow-lg p-6">
               <div className="text-center mb-6">
                 <div className="mx-auto w-20 h-20 bg-blue-100 rounded-full flex items-center justify-center mb-4">
-                  <User className="w-10 h-10 text-blue-600" />
+                  <User className="w-10 h-10 text-[#1c2e4a]" />
                 </div>
                 <h2 className="text-xl font-bold text-gray-900">{userData?.full_name || 'Student'}</h2>
                 <p className="text-gray-600">Aadhar Card No: {userData?.studentId}</p>
