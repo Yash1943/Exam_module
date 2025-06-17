@@ -186,7 +186,7 @@ const ExamInterface = ({ onExamComplete }) => {
           // Determine which parameter to pass based on category
           const categoryParam = examInfo.data.message[0].category === "Software Developer" ? 1 : 2;
           const fetchedQuestions = await get_exam_apptitude_questions(categoryParam);
-          // console.log("fetchedQuestions", fetchedQuestions.data.message);
+          console.log("fetchedQuestions", fetchedQuestions.data.message);
 
           const parsedQuestions = fetchedQuestions.data.message.map((q) => ({
             ...q,
@@ -248,7 +248,7 @@ const ExamInterface = ({ onExamComplete }) => {
   const submitExam = async () => {
     const results = calculateResults();
     const timeSpent = initialTimeInSeconds - timeLeft;
-    // console.log("studentInfo", studentInfo);
+    console.log("studentInfo", studentInfo);
     const username = studentInfo.name;
     const exam_type = studentInfo.applied_position_preference;
     //    {
@@ -264,7 +264,7 @@ const ExamInterface = ({ onExamComplete }) => {
     //     "email_id": "yash@sd.com",
     //     "semester": "VII"
     // }
-    // console.log("results", results); //{
+    console.log("results", results); //{
     //     "totalQuestions": 4,
     //     "attempted": 4,
     //     "correct": 3,
@@ -294,7 +294,7 @@ const ExamInterface = ({ onExamComplete }) => {
       };
     });
 
-    // console.log("participant_evaluation", participant_evaluation);
+    console.log("participant_evaluation", participant_evaluation);
 
     const parrticipant_score_save = await makePostApiCall(
       "samcore.samcore_api.save_apptitude_evalution",
@@ -306,7 +306,7 @@ const ExamInterface = ({ onExamComplete }) => {
       }
     );
 
-    // console.log("parrticipant_score_save", parrticipant_score_save);
+    console.log("parrticipant_score_save", parrticipant_score_save);
 
     console.log("Exam Results:", {
       results,
