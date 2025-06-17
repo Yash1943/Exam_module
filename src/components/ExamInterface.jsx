@@ -188,19 +188,47 @@ const ExamInterface = ({ onExamComplete }) => {
           const fetchedQuestions = await get_exam_apptitude_questions(categoryParam);
           console.log("fetchedQuestions", fetchedQuestions.data.message);
 
-          const parsedQuestions = fetchedQuestions.data.message.map((q) => ({
-            ...q,
-            option: JSON.parse(q.option),
-            answer: JSON.parse(q.answer),
-            id: q.id || Math.random().toString(36).substr(2, 9), // Ensure each question has a unique ID
-            marks: q.marks || 1, // Add marks field, default to 1 if not provided
-          }));
+          const parsedQuestions = fetchedQuestions.data.message.map((q) => {
+            try {
+              // Safely parse option JSON
+              let parsedOption = null;
+              if (q.option) {
+                try {
+                  parsedOption = JSON.parse(q.option);
+                } catch (e) {
+                  console.warn(`Failed to parse option for question: ${q.question}`);
+                  parsedOption = [];
+                }
+              }
+
+              // Safely parse answer JSON
+              let parsedAnswer = null;
+              if (q.answer) {
+                try {
+                  parsedAnswer = JSON.parse(q.answer);
+                } catch (e) {
+                  console.warn(`Failed to parse answer for question: ${q.question}`);
+                  parsedAnswer = q.answer.replace(/^"|"$/g, ''); // Remove surrounding quotes if present
+                }
+              }
+
+              return {
+                ...q,
+                option: parsedOption,
+                answer: parsedAnswer,
+                id: q.id || Math.random().toString(36).substr(2, 9),
+                marks: q.marks || 1,
+              };
+            } catch (error) {
+              console.error(`Error processing question: ${q.question}`, error);
+              return null;
+            }
+          }).filter(Boolean); // Remove any null entries from failed parsing
 
           // Shuffle the questions
           const shuffledQuestions = parsedQuestions.sort(() => Math.random() - 0.5);
-          // console.log("shuffledQuestions",shuffledQuestions)
-
           setQuestions(shuffledQuestions);
+          
           // Initialize selectedAnswers with empty values for each question
           const initialAnswers = {};
           shuffledQuestions.forEach((q) => {
