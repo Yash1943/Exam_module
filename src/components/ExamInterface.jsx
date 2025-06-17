@@ -186,7 +186,9 @@ const ExamInterface = ({ onExamComplete }) => {
     const fetchQuestions = async () => {
       if (examInfo?.data?.message[0]?.category) {
         try {
-          const fetchedQuestions = await get_exam_apptitude_questions(1);
+          // Determine which parameter to pass based on category
+          const categoryParam = examInfo.data.message[0].category === "Software Developer" ? 1 : 2;
+          const fetchedQuestions = await get_exam_apptitude_questions(categoryParam);
           console.log("fetchedQuestions", fetchedQuestions.data.message);
 
           const parsedQuestions = fetchedQuestions.data.message.map((q) => ({
