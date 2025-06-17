@@ -11,7 +11,7 @@ const ExamInterface = ({ onExamComplete }) => {
   const navigate = useNavigate();
   const { studentInfo, examInfo, timeOfExam, totalMarks } = location.state || {};
 
-  console.log("timeOfExam from location.state:", timeOfExam);
+  console.log("timeOfExam from location.state:", examInfo);
 
   // Add fullscreen functionality
   useEffect(() => {
@@ -195,10 +195,15 @@ const ExamInterface = ({ onExamComplete }) => {
             answer: JSON.parse(q.answer),
             id: q.id || Math.random().toString(36).substr(2, 9), // Ensure each question has a unique ID
           }));
-          setQuestions(parsedQuestions);
+
+          // Shuffle the questions
+          const shuffledQuestions = parsedQuestions.sort(() => Math.random() - 0.5);
+          console.log("shuffledQuestions",shuffledQuestions)
+
+          setQuestions(shuffledQuestions);
           // Initialize selectedAnswers with empty values for each question
           const initialAnswers = {};
-          parsedQuestions.forEach((q) => {
+          shuffledQuestions.forEach((q) => {
             initialAnswers[q.id] = undefined;
           });
           setSelectedAnswers(initialAnswers);
@@ -466,13 +471,17 @@ const ExamInterface = ({ onExamComplete }) => {
                   <span className="text-sm text-gray-500">{currentQ.subject}</span>
                   <span
                     className={`px-2 py-1 rounded text-xs font-medium ${
-                      currentQ.difficulty === "Easy"
+                      currentQ.question_leval === "Easy"
                         ? "bg-green-100 text-green-700"
-                        : currentQ.difficulty === "Medium"
+                        : currentQ.question_leval === "Medium"
                         ? "bg-yellow-100 text-yellow-700"
-                        : "bg-red-100 text-red-700"
+                        : currentQ.question_leval === "Hard"
+                        ? "bg-red-100 text-red-700"
+                        : currentQ.question_leval === "Extreme"
+                        ? "bg-purple-100 text-purple-700"
+                        : "bg-gray-100 text-gray-700"
                     }`}>
-                    {currentQ.difficulty}
+                    {currentQ.question_leval}
                   </span>
                 </div>
               </div>
