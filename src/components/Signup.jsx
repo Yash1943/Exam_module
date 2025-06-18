@@ -130,6 +130,7 @@ const Signup = () => {
     const fetchPreferences = async () => {
       try {
         const data = await get_position_preffrence();
+        console.log("message",data.data.message)
         setPreferences(data.data.message || []);
       } catch (error) {
         console.error('Failed to fetch preferences:', error);
@@ -544,7 +545,7 @@ const Signup = () => {
                       <option value="">Select a position</option>
                       {preferences.map((pref, index) => (
                         <option key={index} value={pref.name}>
-                          {pref.category}
+                          {pref.position_name}
                         </option>
                       ))}
                     </select>

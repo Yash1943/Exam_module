@@ -11,7 +11,7 @@ export const check_signin_apptitude_exam = async (addhar_no,password) => {
   });
 };
 export const get_position_preffrence = async () => {
-  return makeApiCall("samcore.samcore_api.get_position_preffrence", {
+  return makeApiCall("samcore.samcore_api.get_apptitude_active_postion", {
    
   });
 };

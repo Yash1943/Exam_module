@@ -37,7 +37,7 @@ const questionStyles = `
 const ExamInterface = ({ onExamComplete }) => {
   const location = useLocation();
   const navigate = useNavigate();
-  const { studentInfo, examInfo, timeOfExam, totalMarks } = location.state || {};
+  const { studentInfo, examInfo, timeOfExam, totalMarks, selectedExam } = location.state || {};
 
   // console.log("examInfo",examInfo)
   // Add fullscreen functionality
@@ -211,11 +211,11 @@ const ExamInterface = ({ onExamComplete }) => {
   // Fetch and parse questions
   useEffect(() => {
     const fetchQuestions = async () => {
-      if (examInfo?.data?.message[0]?.category) {
+      if (selectedExam?.category) {
         try {
-          // Determine which parameter to pass based on category
-          const categoryParam = examInfo.data.message[0].category === "Software Developer" ? 1 : 2;
-          const fetchedQuestions = await get_exam_apptitude_questions(categoryParam);
+          // Pass the category name directly to the API
+          console.log("selectedExam.category",selectedExam.category)
+          const fetchedQuestions = await get_exam_apptitude_questions(selectedExam.category);
           // console.log("fetchedQuestions", fetchedQuestions.data.message);
 
           const parsedQuestions = fetchedQuestions.data.message.map((q) => {
@@ -269,11 +269,11 @@ const ExamInterface = ({ onExamComplete }) => {
           console.error("Error fetching questions:", error);
         }
       } else {
-        console.warn("Exam category not available in examInfo.");
+        console.warn("Exam category not available in selectedExam.");
       }
     };
     fetchQuestions();
-  }, [examInfo]);
+  }, [selectedExam]);
 
   // Redirect if no student info
   useEffect(() => {
@@ -308,7 +308,7 @@ const ExamInterface = ({ onExamComplete }) => {
     const timeSpent = initialTimeInSeconds - timeLeft;
     console.log("studentInfo", studentInfo);
     const username = studentInfo.name;
-    const exam_type = studentInfo.applied_position_preference;
+    const exam_type = selectedExam.name;
     //    {
     //     "studentId": "123",
     //     "name": 1,
@@ -342,6 +342,7 @@ const ExamInterface = ({ onExamComplete }) => {
 
       return {
         question: question.question,
+        score: question.marks,
         answer:
           userAnswer !== undefined
             ? question.option
@@ -352,7 +353,10 @@ const ExamInterface = ({ onExamComplete }) => {
       };
     });
 
-    console.log("participant_evaluation", participant_evaluation);
+    console.log("username,exam_type,total_marks,participant_evaluation", username,
+      exam_type,
+      total_marks,
+      participant_evaluation);
 
     const parrticipant_score_save = await makePostApiCall(
       "samcore.samcore_api.save_apptitude_evalution",

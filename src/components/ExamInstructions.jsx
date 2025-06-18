@@ -3,7 +3,9 @@ import { AlertTriangle, Clock, CheckCircle, User, LogOut } from 'lucide-react';
 import { examConfig } from '../data/questions';
 import { useAuth } from '../context/AuthContext';
 import { useNavigate } from 'react-router-dom';
-import { get_exam_apptitude_info , get_is_exam_completed } from '../api/get_question';
+import { get_exam_apptitude_info, get_is_exam_completed } from '../api/get_question';
+import { get_apptitude_exams } from '../api/get_apptitude_exam';
+import ExamCards from './ExamCards';
 
 const ExamInstructions = () => {
   const { userData, logout } = useAuth();
@@ -13,11 +15,14 @@ const ExamInstructions = () => {
   const [minimummarks, setminimummarks] = useState('');
   const [time_of_exam, settime_of_exam] = useState('');
   const [total_marks, set_total_marks] = useState('');
-  const[username,setusername] = useState('')
-  const[iscompletedexam , setiscompletedexam] = useState('')
+  const [username, setusername] = useState('');
+  const [iscompletedexam, setiscompletedexam] = useState('');
+  const [examTitles, setExamTitles] = useState([]);
+  const [selectedExam, setSelectedExam] = useState(null);
+  // const[username,setusername] = useState('')
 
   const formatTime = (time_of_exam) => {
-    // console.log("Raw time_of_exam value:", time_of_exam);
+    console.log("Raw time_of_exam value:", userData);
     
     if (!time_of_exam) return '0 minutes';
     
@@ -59,21 +64,24 @@ const ExamInstructions = () => {
   useEffect(() => {
     if (userData) {
       // console.log("userData", userData);
-      setcetegorystate(userData.applied_position_preference);
+      // setcetegorystate(userData.applied_position_preference);
       setusername(userData.name);
+      // setusername(userData.name)
     }
   }, [userData]);
 
   useEffect(() => {
     const fetchExamInfo = async () => {
-      if (cetegorystate) {
+      if (username) {
         try {
-          // console.log("username",username)
-          const get_is_completed_exam = await get_is_exam_completed(username)
-          console.log("get_is_completed_exam",get_is_completed_exam.data.message)
-          setiscompletedexam(get_is_completed_exam.data.message[0])
+          const get_exam_title = await get_apptitude_exams(username)
+          console.log("get_exam_title", get_exam_title.data.message)
+          setExamTitles(get_exam_title.data.message)
+          // const get_is_completed_exam = await get_is_exam_completed(username)
+          // setiscompletedexam(get_is_completed_exam.data.message[0])
+          console.log("cetegorystate",cetegorystate)
           const get_exam_info = await get_exam_apptitude_info(cetegorystate);
-          console.log("get_exam_info", get_exam_info);
+          console.log("get_exam_info", get_exam_info.data.message[0]);
           setminimummarks(get_exam_info.data.message[0].minimum_passing_score);
           settime_of_exam(get_exam_info.data.message[0].time_of_exam);
           set_total_marks(get_exam_info.data.message[0].total_marks);
@@ -85,14 +93,24 @@ const ExamInstructions = () => {
     };
 
     fetchExamInfo();
-  }, [cetegorystate,username]);
+  }, [cetegorystate, username]);
 
   const handleLogout = () => {
     logout();
     navigate('/');
   };
 
+  const handleExamSelect = (exam) => {
+    setSelectedExam(exam);
+    setcetegorystate(exam.name);
+  };
+
   const handleStartExam = async () => {
+    if (!selectedExam) {
+      alert('Please select an exam first');
+      return;
+    }
+
     try {
       // Request fullscreen before navigating
       const element = document.documentElement;
@@ -108,7 +126,15 @@ const ExamInstructions = () => {
     }
     
     // Navigate to exam interface with user data and exam info
-    navigate('/exam', { state: { studentInfo: userData, examInfo: examInfo, timeOfExam: time_of_exam, totalMarks: total_marks } });
+    navigate('/exam', { 
+      state: { 
+        studentInfo: userData, 
+        examInfo: examInfo, 
+        timeOfExam: time_of_exam, 
+        totalMarks: total_marks,
+        selectedExam: selectedExam 
+      } 
+    });
   };
 
   return (
@@ -163,30 +189,15 @@ const ExamInstructions = () => {
           {/* Main Content */}
           <div className="lg:col-span-3">
             <div className="bg-white rounded-xl shadow-lg p-8">
-              {iscompletedexam === 1 ? (
-                <div className="text-center">
-                  <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-6 mb-6">
-                    <AlertTriangle className="w-12 h-12 text-yellow-500 mx-auto mb-4" />
-                    <h2 className="text-2xl font-bold text-yellow-800 mb-2">Exam Already Completed</h2>
-                    <p className="text-yellow-700 mb-4">
-                      You have already submitted this exam. You cannot take the exam again.
-                    </p>
-                    {/* <button
-                      onClick={handleLogout}
-                      className="bg-red-500 hover:bg-red-600 text-white font-semibold py-3 px-6 rounded-lg transition-colors"
-                    >
-                      Logout
-                    </button> */}
-                  </div>
-                </div>
-              ) : (
                 <>
+                
+
                   <div className="text-center mb-8">
                     <h1 className="text-3xl font-bold text-gray-900 mb-2">{examConfig.title}</h1>
                     <div className="flex justify-center items-center space-x-6 text-sm text-gray-600">
                       <div className="flex items-center">
-                        <Clock className="w-4 h-4 mr-1" />
-                        Duration: {formatTime(time_of_exam)}
+                        {/* <Clock className="w-4 h-4 mr-1" /> */}
+                        {/* Duration: {formatTime(time_of_exam)} */}
                       </div>
                       <div className="flex items-center">
                         {/* <CheckCircle className="w-4 h-4 mr-1" />
@@ -274,16 +285,25 @@ const ExamInstructions = () => {
                     </ul>
                   </div>
 
+                    <div className="mb-8">
+                    <h2 className="text-xl font-semibold text-gray-900 mb-4">Available Exams</h2>
+                    <ExamCards 
+                      examTitles={examTitles} 
+                      onExamSelect={handleExamSelect} 
+                      selectedExam={selectedExam}
+                    />
+                  </div>
+                {examTitles.remaining_exams && examTitles.remaining_exams.length > 0 &&
                   <div className="text-center">
                     <button
                       onClick={handleStartExam}
                       className="bg-green-500 hover:bg-green-600 text-white font-semibold py-4 px-8 rounded-lg transition-colors text-lg focus:ring-2 focus:ring-green-500 focus:ring-offset-2"
                     >
-                      I Understand - Start Exam
+                      {selectedExam ? `Start ${selectedExam.exam_name}` : 'Select an Exam'}
                     </button>
                   </div>
+                  }
                 </>
-              )}
             </div>
           </div>
         </div>
