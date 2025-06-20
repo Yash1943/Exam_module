@@ -39,11 +39,16 @@ const ExamCards = ({ examTitles, onExamSelect, selectedExam }) => {
                   <div className="flex-1">
                     <div className="flex items-center justify-between">
                       <h3 className="text-lg font-semibold text-gray-900 mb-1">{exam.exam_name}</h3>
-                      <span className="flex items-center text-green-600 text-sm">
+                      {/* <span className="flex items-center text-green-600 text-sm">
+                        <CheckCircle className="w-4 h-4 mr-1" />
+                        Completed
+                      </span> */}
+                    </div>
+
+                    <span className="flex items-center text-green-600 text-sm">
                         <CheckCircle className="w-4 h-4 mr-1" />
                         Completed
                       </span>
-                    </div>
                     {/* <p className="text-gray-600">
                       {exam.category}
                     </p> */}
