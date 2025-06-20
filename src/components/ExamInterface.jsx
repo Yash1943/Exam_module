@@ -158,6 +158,7 @@ const ExamInterface = ({ onExamComplete }) => {
   const [markedForReview, setMarkedForReview] = useState(new Set());
   const [violationCount, setViolationCount] = useState(0);
   const [showViolationWarning, setShowViolationWarning] = useState(false);
+  const [originalQuestions, setOriginalQuestions] = useState([]);
 
   const handleTimeUp = () => {
     submitExam();
@@ -255,8 +256,8 @@ const ExamInterface = ({ onExamComplete }) => {
             }
           }).filter(Boolean); // Remove any null entries from failed parsing
 
-          // Shuffle the questions
-          const shuffledQuestions = parsedQuestions.sort(() => Math.random() - 0.5);
+          setOriginalQuestions(parsedQuestions);
+          const shuffledQuestions = [...parsedQuestions].sort(() => Math.random() - 0.5);
           setQuestions(shuffledQuestions);
           
           // Initialize selectedAnswers with empty values for each question
@@ -332,7 +333,7 @@ const ExamInterface = ({ onExamComplete }) => {
     //     "passed": true
     // }
     const total_marks = results.correct;
-    const participant_evaluation = questions.map((question) => {
+    const participant_evaluation = originalQuestions.map((question) => {
       const userAnswer = selectedAnswers[question.id];
       const isCorrect =
         question.option && question.option.length > 0
