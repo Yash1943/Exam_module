@@ -159,6 +159,7 @@ const ExamInterface = ({ onExamComplete }) => {
   const [violationCount, setViolationCount] = useState(0);
   const [showViolationWarning, setShowViolationWarning] = useState(false);
   const [originalQuestions, setOriginalQuestions] = useState([]);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const handleTimeUp = () => {
     submitExam();
@@ -305,92 +306,101 @@ const ExamInterface = ({ onExamComplete }) => {
   };
 
   const submitExam = async () => {
-    const results = calculateResults();
-    const timeSpent = initialTimeInSeconds - timeLeft;
-    console.log("studentInfo", studentInfo);
-    const username = studentInfo.name;
-    const exam_type = selectedExam.name;
-    //    {
-    //     "studentId": "123",
-    //     "name": 1,
-    //     "full_name": "yash",
-    //     "collage_name": "sk",
-    //     "branch": "IT",
-    //     "addhar_card_no": "123",
-    //     "applied_position_preference": "1",
-    //     "prn_no": "123",
-    //     "phone_no": 123,
-    //     "email_id": "yash@sd.com",
-    //     "semester": "VII"
-    // }
-    console.log("results", results); //{
-    //     "totalQuestions": 4,
-    //     "attempted": 4,
-    //     "correct": 3,
-    //     "incorrect": 1,
-    //     "unanswered": 0,
-    //     "percentage": 75,
-    //     "passed": true
-    // }
-    const total_marks = results.correct;
-    const participant_evaluation = originalQuestions.map((question) => {
-      const userAnswer = selectedAnswers[question.id];
-      const isCorrect =
-        question.option && question.option.length > 0
-          ? question.option[userAnswer] === question.answer
-          : String(userAnswer).toLowerCase().trim() ===
-            String(question.answer).toLowerCase().trim();
+    if (isSubmitting) return; // Prevent double submit
+    setIsSubmitting(true);
+    try {
+      const results = calculateResults();
+      const timeSpent = initialTimeInSeconds - timeLeft;
+      console.log("studentInfo", studentInfo);
+      const username = studentInfo.name;
+      const exam_type = selectedExam.name;
+      //    {
+      //     "studentId": "123",
+      //     "name": 1,
+      //     "full_name": "yash",
+      //     "collage_name": "sk",
+      //     "branch": "IT",
+      //     "addhar_card_no": "123",
+      //     "applied_position_preference": "1",
+      //     "prn_no": "123",
+      //     "phone_no": 123,
+      //     "email_id": "yash@sd.com",
+      //     "semester": "VII"
+      // }
+      console.log("results", results); //{
+      //     "totalQuestions": 4,
+      //     "attempted": 4,
+      //     "correct": 3,
+      //     "incorrect": 1,
+      //     "unanswered": 0,
+      //     "percentage": 75,
+      //     "passed": true
+      // }
+      const total_marks = results.correct;
+      const participant_evaluation = originalQuestions.map((question) => {
+        const userAnswer = selectedAnswers[question.id];
+        const isCorrect =
+          question.option && question.option.length > 0
+            ? question.option[userAnswer] === question.answer
+            : String(userAnswer).toLowerCase().trim() ===
+              String(question.answer).toLowerCase().trim();
 
-      return {
-        question: question.question,
-        score: question.marks,
-        answer:
-          userAnswer !== undefined
-            ? question.option
-              ? question.option[userAnswer]
-              : userAnswer
-            : "Not answered",
-        evaluation: isCorrect ? 1 : 0,
-      };
-    });
+        return {
+          question: question.question,
+          score: question.marks,
+          answer:
+            userAnswer !== undefined
+              ? question.option
+                ? question.option[userAnswer]
+                : userAnswer
+              : "Not answered",
+          evaluation: isCorrect ? 1 : 0,
+        };
+      });
 
-    console.log("username,exam_type,total_marks,participant_evaluation", username,
-      exam_type,
-      total_marks,
-      participant_evaluation);
-
-    const parrticipant_score_save = await makePostApiCall(
-      "samcore.samcore_api.save_apptitude_evalution",
-      {
-        username,
+      console.log("username,exam_type,total_marks,participant_evaluation", username,
         exam_type,
         total_marks,
-        participant_evaluation,
-      }
-    );
+        participant_evaluation);
 
-    console.log("parrticipant_score_save", parrticipant_score_save);
+      const parrticipant_score_save = await makePostApiCall(
+        "samcore.samcore_api.save_apptitude_evalution",
+        {
+          username,
+          exam_type,
+          total_marks,
+          participant_evaluation,
+        }
+      );
 
-    console.log("Exam Results:", {
-      results,
-      timeSpent,
-      violationCount,
-      studentInfo: {
-        id: studentInfo?.studentId,
-        name: studentInfo?.full_name,
-      },
-    });
+      console.log("parrticipant_score_save", parrticipant_score_save);
 
-    navigate("/results", {
-      state: {
-        examData: {
-          results,
-          timeSpent,
-          violationCount,
-          studentInfo,
+      console.log("Exam Results:", {
+        results,
+        timeSpent,
+        violationCount,
+        studentInfo: {
+          id: studentInfo?.studentId,
+          name: studentInfo?.full_name,
         },
-      },
-    });
+      });
+
+      navigate("/results", {
+        state: {
+          examData: {
+            results,
+            timeSpent,
+            violationCount,
+            studentInfo,
+          },
+        },
+      });
+    } catch (error) {
+      // Optionally handle error
+      console.error("Error during exam submission:", error);
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   const calculateResults = () => {
@@ -505,8 +515,20 @@ const ExamInterface = ({ onExamComplete }) => {
 
               <button
                 onClick={submitExam}
-                className="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-lg font-medium transition-colors">
-                Submit Exam
+                disabled={isSubmitting}
+                className={`bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-lg font-medium transition-colors flex items-center justify-center ${isSubmitting ? 'opacity-60 cursor-not-allowed' : ''}`}
+              >
+                {isSubmitting ? (
+                  <>
+                    <svg className="animate-spin -ml-1 mr-2 h-5 w-5 text-white" fill="none" viewBox="0 0 24 24">
+                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                    </svg>
+                    Submitting...
+                  </>
+                ) : (
+                  'Submit Exam'
+                )}
               </button>
             </div>
           </div>
