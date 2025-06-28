@@ -165,7 +165,22 @@ const ExamInterface = ({ onExamComplete }) => {
     submitExam();
   };
 
-  const { timeLeft, startTimer, formatTime } = useTimer(initialTimeInSeconds, handleTimeUp);
+  // Function to format total time taken
+  const formatTimeTaken = (seconds) => {
+    const hours = Math.floor(seconds / 3600);
+    const minutes = Math.floor((seconds % 3600) / 60);
+    const remainingSeconds = seconds % 60;
+    
+    if (hours > 0) {
+      return `${hours}h ${minutes}m ${remainingSeconds}s`;
+    } else if (minutes > 0) {
+      return `${minutes}m ${remainingSeconds}s`;
+    } else {
+      return `${remainingSeconds}s`;
+    }
+  };
+
+  const { timeLeft, startTimer, formatTime, stopTimer } = useTimer(initialTimeInSeconds, handleTimeUp);
 
   const handleViolation = (message) => {
     setViolationCount((prev) => prev + 1);
@@ -173,6 +188,7 @@ const ExamInterface = ({ onExamComplete }) => {
 
     if (violationCount >= 2) {
       alert("Multiple violations detected. Exam will be submitted automatically.");
+      stopTimer(); // Stop the timer when exam is submitted due to violations
       submitExam();
     } else {
       alert(message);
@@ -198,6 +214,7 @@ const ExamInterface = ({ onExamComplete }) => {
     );
     // Cleanup function for event listener
     return () => {
+      stopTimer(); // Stop timer when component unmounts
       document.removeEventListener(
         "wheel",
         (e) => {
@@ -208,7 +225,7 @@ const ExamInterface = ({ onExamComplete }) => {
         { passive: false }
       );
     };
-  }, [initialTimeInSeconds, startTimer]);
+  }, [initialTimeInSeconds, startTimer, stopTimer]);
 
   // Fetch and parse questions
   useEffect(() => {
@@ -308,26 +325,18 @@ const ExamInterface = ({ onExamComplete }) => {
   const submitExam = async () => {
     if (isSubmitting) return; // Prevent double submit
     setIsSubmitting(true);
+    stopTimer(); // Stop the timer when exam is being submitted
     try {
       const results = calculateResults();
       const timeSpent = initialTimeInSeconds - timeLeft;
-      console.log("studentInfo", studentInfo);
+      // console.log("studentInfo", studentInfo);
       const username = studentInfo.name;
       const exam_type = selectedExam.name;
-      //    {
-      //     "studentId": "123",
-      //     "name": 1,
-      //     "full_name": "yash",
-      //     "collage_name": "sk",
-      //     "branch": "IT",
-      //     "addhar_card_no": "123",
-      //     "applied_position_preference": "1",
-      //     "prn_no": "123",
-      //     "phone_no": 123,
-      //     "email_id": "yash@sd.com",
-      //     "semester": "VII"
-      // }
-      console.log("results", results); //{
+
+      // console.log("Total time taken:", formatTimeTaken(timeSpent));
+      // console.log(timeSpent, "seconds");
+      // const formatedtimeSpent = formatTimeTaken(timeSpent)
+      // console.log("results", results); //{
       //     "totalQuestions": 4,
       //     "attempted": 4,
       //     "correct": 3,
@@ -366,10 +375,7 @@ const ExamInterface = ({ onExamComplete }) => {
       const parrticipant_score_save = await makePostApiCall(
         "samcore.samcore_api.save_apptitude_evalution",
         {
-          username,
-          exam_type,
-          total_marks,
-          participant_evaluation,
+          username, exam_type, total_marks,formatedtimeSpent, participant_evaluation
         }
       );
 
@@ -378,23 +384,32 @@ const ExamInterface = ({ onExamComplete }) => {
       console.log("Exam Results:", {
         results,
         timeSpent,
+        timeTakenFormatted: formatTimeTaken(timeSpent),
         violationCount,
         studentInfo: {
           id: studentInfo?.studentId,
           name: studentInfo?.full_name,
         },
       });
-
-      navigate("/results", {
-        state: {
-          examData: {
-            results,
-            timeSpent,
-            violationCount,
-            studentInfo,
+      if(parrticipant_score_save.success == true){
+        navigate("/results", {
+          state: {
+            examData: {
+              results,
+              timeSpent,
+              timeTakenFormatted: formatTimeTaken(timeSpent),
+              violationCount,
+              studentInfo,
+            },
           },
-        },
-      });
+        });
+      }else{
+        navigate("/results", {
+          state: {
+            examData: "Error During Exam Submission"
+          },
+        });
+      }
     } catch (error) {
       // Optionally handle error
       console.error("Error during exam submission:", error);
