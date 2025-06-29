@@ -335,7 +335,7 @@ const ExamInterface = ({ onExamComplete }) => {
 
       // console.log("Total time taken:", formatTimeTaken(timeSpent));
       // console.log(timeSpent, "seconds");
-      // const formatedtimeSpent = formatTimeTaken(timeSpent)
+      const formatedtimeSpent = formatTimeTaken(timeSpent)
       // console.log("results", results); //{
       //     "totalQuestions": 4,
       //     "attempted": 4,
