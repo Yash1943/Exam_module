@@ -1,77 +1,91 @@
 import React, { useState, useEffect } from 'react';
 import { Check, Crown, Star, Zap } from 'lucide-react';
-import { loadStripe } from '@stripe/stripe-js';
 import { useAuth } from '../context/AuthContext';
-
-const stripePromise = loadStripe(import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY);
+import { useNavigate } from 'react-router-dom';
 
 const SubscriptionPlans = () => {
   const { userData } = useAuth();
+  const navigate = useNavigate();
   const [plans, setPlans] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [processingPlan, setProcessingPlan] = useState(null);
   const [billingCycle, setBillingCycle] = useState('monthly');
 
   useEffect(() => {
-    fetchPlans();
+    // Mock subscription plans for testing
+    const mockPlans = [
+      {
+        _id: 'free',
+        name: 'free',
+        displayName: 'Free',
+        description: 'Basic access to limited exams',
+        price: { monthly: 0, yearly: 0 },
+        features: {
+          maxExamAttempts: 1,
+          maxAccountAccess: 1,
+          examTypes: ['basic'],
+          supportLevel: 'basic',
+          analyticsAccess: false,
+          customBranding: false,
+          apiAccess: false
+        }
+      },
+      {
+        _id: 'basic',
+        name: 'basic',
+        displayName: 'Basic',
+        description: 'Perfect for individual learners',
+        price: { monthly: 9.99, yearly: 99.99 },
+        features: {
+          maxExamAttempts: 10,
+          maxAccountAccess: 1,
+          examTypes: ['basic', 'intermediate'],
+          supportLevel: 'basic',
+          analyticsAccess: true,
+          customBranding: false,
+          apiAccess: false
+        }
+      },
+      {
+        _id: 'premium',
+        name: 'premium',
+        displayName: 'Premium',
+        description: 'Best for serious learners and professionals',
+        price: { monthly: 19.99, yearly: 199.99 },
+        features: {
+          maxExamAttempts: 50,
+          maxAccountAccess: 3,
+          examTypes: ['basic', 'intermediate', 'advanced'],
+          supportLevel: 'priority',
+          analyticsAccess: true,
+          customBranding: true,
+          apiAccess: false
+        }
+      },
+      {
+        _id: 'enterprise',
+        name: 'enterprise',
+        displayName: 'Enterprise',
+        description: 'For organizations and institutions',
+        price: { monthly: 49.99, yearly: 499.99 },
+        features: {
+          maxExamAttempts: -1, // unlimited
+          maxAccountAccess: 10,
+          examTypes: ['basic', 'intermediate', 'advanced', 'expert'],
+          supportLevel: 'premium',
+          analyticsAccess: true,
+          customBranding: true,
+          apiAccess: true
+        }
+      }
+    ];
+
+    setPlans(mockPlans);
+    setLoading(false);
   }, []);
 
-  const fetchPlans = async () => {
-    try {
-      const response = await fetch('/api/subscriptions/plans');
-      const data = await response.json();
-      if (data.success) {
-        setPlans(data.data);
-      }
-    } catch (error) {
-      console.error('Error fetching plans:', error);
-    } finally {
-      setLoading(false);
-    }
-  };
-
   const handleSubscribe = async (planId) => {
-    if (!userData) {
-      alert('Please login to subscribe');
-      return;
-    }
-
-    setProcessingPlan(planId);
-
-    try {
-      const response = await fetch('/api/subscriptions/create-checkout-session', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${localStorage.getItem('token')}`
-        },
-        body: JSON.stringify({
-          planId,
-          billingCycle
-        })
-      });
-
-      const data = await response.json();
-      
-      if (data.success) {
-        const stripe = await stripePromise;
-        const { error } = await stripe.redirectToCheckout({
-          sessionId: data.data.sessionId
-        });
-
-        if (error) {
-          console.error('Stripe error:', error);
-          alert('Payment failed. Please try again.');
-        }
-      } else {
-        alert(data.message || 'Failed to create checkout session');
-      }
-    } catch (error) {
-      console.error('Subscription error:', error);
-      alert('An error occurred. Please try again.');
-    } finally {
-      setProcessingPlan(null);
-    }
+    // Mock subscription for testing
+    alert(`Testing Mode: You now have ${plans.find(p => p._id === planId)?.displayName} access! All features are unlocked for testing.`);
   };
 
   const getPlanIcon = (planName) => {
@@ -83,7 +97,7 @@ const SubscriptionPlans = () => {
       case 'premium':
         return <Crown className="w-8 h-8 text-purple-500" />;
       case 'enterprise':
-        return <Crown className="w-8 h-8 text-gold-500" />;
+        return <Crown className="w-8 h-8 text-yellow-500" />;
       default:
         return <Star className="w-8 h-8 text-gray-500" />;
     }
@@ -134,9 +148,12 @@ const SubscriptionPlans = () => {
           <h1 className="text-4xl font-bold text-gray-900 mb-4">
             Choose Your Plan
           </h1>
-          <p className="text-xl text-gray-600 mb-8">
+          <p className="text-xl text-gray-600 mb-4">
             Select the perfect plan for your learning journey
           </p>
+          <div className="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded mb-8">
+            <strong>Testing Mode:</strong> All plans provide full access for testing purposes. No real payments required.
+          </div>
 
           {/* Billing Toggle */}
           <div className="flex items-center justify-center mb-8">
@@ -200,6 +217,9 @@ const SubscriptionPlans = () => {
                     /{billingCycle === 'yearly' ? 'year' : 'month'}
                   </span>
                 </div>
+                <div className="text-sm text-green-600 font-medium">
+                  Testing: Full Access Included
+                </div>
               </div>
 
               <div className="space-y-4 mb-8">
@@ -251,56 +271,28 @@ const SubscriptionPlans = () => {
 
               <button
                 onClick={() => handleSubscribe(plan._id)}
-                disabled={processingPlan === plan._id || plan.name === 'free'}
-                className={`w-full py-3 px-6 rounded-lg font-medium text-white transition-colors ${getButtonColor(plan.name)} ${
-                  processingPlan === plan._id ? 'opacity-50 cursor-not-allowed' : ''
-                } ${plan.name === 'free' ? 'bg-gray-400 cursor-not-allowed' : ''}`}
+                className={`w-full py-3 px-6 rounded-lg font-medium text-white transition-colors ${getButtonColor(plan.name)}`}
               >
-                {processingPlan === plan._id ? (
-                  <div className="flex items-center justify-center">
-                    <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white mr-2"></div>
-                    Processing...
-                  </div>
-                ) : plan.name === 'free' ? (
-                  'Current Plan'
-                ) : (
-                  `Subscribe to ${plan.displayName}`
-                )}
+                Test {plan.displayName} Plan
               </button>
             </div>
           ))}
         </div>
 
         <div className="mt-16 text-center">
-          <h2 className="text-2xl font-bold text-gray-900 mb-4">
-            Frequently Asked Questions
-          </h2>
-          <div className="max-w-3xl mx-auto space-y-6">
-            <div className="bg-white rounded-lg p-6 shadow-sm">
-              <h3 className="font-semibold text-gray-900 mb-2">
-                Can I change my plan anytime?
-              </h3>
-              <p className="text-gray-600">
-                Yes, you can upgrade or downgrade your plan at any time. Changes will be reflected in your next billing cycle.
-              </p>
-            </div>
-            <div className="bg-white rounded-lg p-6 shadow-sm">
-              <h3 className="font-semibold text-gray-900 mb-2">
-                What happens if I exceed my exam attempts?
-              </h3>
-              <p className="text-gray-600">
-                You'll need to upgrade your plan or wait for the next billing cycle to get additional attempts.
-              </p>
-            </div>
-            <div className="bg-white rounded-lg p-6 shadow-sm">
-              <h3 className="font-semibold text-gray-900 mb-2">
-                Is there a free trial?
-              </h3>
-              <p className="text-gray-600">
-                Yes, all new users start with a free plan that includes limited access to our platform.
-              </p>
-            </div>
+          <div className="bg-blue-50 border border-blue-200 rounded-lg p-6 mb-8">
+            <h3 className="text-lg font-semibold text-blue-900 mb-2">Testing Mode Information</h3>
+            <p className="text-blue-800">
+              All subscription plans provide full access during testing. You can explore all features without any restrictions or payments.
+            </p>
           </div>
+
+          <button
+            onClick={() => navigate('/dashboard')}
+            className="bg-blue-500 hover:bg-blue-600 text-white font-medium py-3 px-6 rounded-lg transition-colors"
+          >
+            Back to Dashboard
+          </button>
         </div>
       </div>
     </div>
