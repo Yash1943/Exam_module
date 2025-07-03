@@ -2,7 +2,8 @@ const express = require("express");
 const app = express();
 require("dotenv").config();
 const bcrypt = require("bcrypt");
-const { User } = require("./models");
+const { User, PositionPreference } = require("./models"); // <-- FIXED: import PositionPreference from models/index.js
+// const PositionPreference = require("./models/PositionPreference"); // <-- REMOVED
 
 app.use(express.json());
 app.use(require("cors")());
@@ -43,6 +44,66 @@ app.post("/api/login", async (req, res) => {
     });
   } catch (err) {
     return res.status(500).json({ success: false, message: "Server error", error: err.message });
+  }
+});
+
+app.get("/api/signup", async (req, res) => {
+  try {
+    const get_applied_possition = await PositionPreference.findAll();
+    // req.json(get_applied_possition);
+    console.log("get_applied_possition", get_applied_possition);
+    return res.json({
+      success: true,
+      message: "Position preferences fetched successfully",
+      data: get_applied_possition,
+    });
+  } catch (error) {
+    console.log(error);
+    // req.flash("error", `Error:${error}`);
+  }
+});
+
+app.post("/api/signup", async (req, res) => {
+  // Extract fields from req.body.data for compatibility with frontend
+  const {
+    full_name,
+    college_name,
+    branch,
+    applied_position_preference,
+    prn_no,
+    phone_no,
+    email_id,
+    aadhar_card_no,
+    password,
+  } = req.body.data || {};
+  // Check for required fields
+  if (!full_name || !aadhar_card_no || !password) {
+    return res.status(400).json({ success: false, message: "Required fields are missing" });
+  }
+  console.log("Received signup data req.body:", req.body);
+  try {
+    const hashedPassword = await bcrypt.hash(password, 10);
+    const user = await User.create({
+      fullName: full_name,
+      collegeName: college_name,
+      branch,
+      appliedPositionPreference: applied_position_preference,
+      prnNo: prn_no,
+      phoneNo: phone_no,
+      emailId: email_id,
+      aadharCardNo: aadhar_card_no,
+      password: hashedPassword,
+    });
+    return res.json({
+      success: true,
+      message: "User created successfully",
+      data: user,
+    });
+  } catch (error) {
+    console.error("Error creating user:", error);
+    return res
+      .status(500)
+      .json({ success: false, message: "Server error", error: error.message, req: req.body });
   }
 });
 

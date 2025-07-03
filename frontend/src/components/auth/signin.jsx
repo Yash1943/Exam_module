@@ -63,6 +63,10 @@ function Signin() {
         <button type="submit">Sign In</button>
         {error && <div className="error">{error}</div>}
         {success && <div className="success">{success}</div>}
+        <div className="links">
+          <a href="/signup">Don't have an account? Sign Up</a>
+          <a href="/forgot-password">Forgot Password?</a>
+        </div>
       </form>
     </div>
   );

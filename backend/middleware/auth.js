@@ -14,6 +14,7 @@ const session = require("express-session");
 // const connectEnsureLogin = require("connect-ensure-login");
 
 const bodyParser = require("body-parser"); //for Read the post req of the body
+const PositionPreference = require("../models/PositionPreference");
 app.use(bodyParser.json());
 app.use(express.urlencoded({ extended: false })); //for understanding the url data
 
@@ -108,6 +109,21 @@ app.post("/api/login", async (req, res) => {
     // });
   } catch (err) {
     return res.status(500).json({ success: false, message: "Server error", error: err.message });
+  }
+});
+
+app.get("/api/signup", async (req, res) => {
+  try {
+    const get_applied_possition = await PositionPreference.findAll();
+    console.log("get_applied_possition", get_applied_possition);
+    return res.json({
+      success: true,
+      message: "Position preferences fetched successfully",
+      data: get_applied_possition,
+    });
+  } catch (error) {
+    console.log(error);
+    req.flash("error", `Error:${error}`);
   }
 });
 
