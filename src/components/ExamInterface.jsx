@@ -363,6 +363,7 @@ const ExamInterface = ({ onExamComplete }) => {
                 ? question.option[userAnswer]
                 : userAnswer
               : "Not answered",
+          correct_answer: question.answer,
           evaluation: isCorrect ? 1 : 0,
         };
       });
