@@ -363,15 +363,10 @@ const ExamInterface = ({ onExamComplete }) => {
                 ? question.option[userAnswer]
                 : userAnswer
               : "Not answered",
-          correct_ans: question.answer,
+          correct_answer: question.answer,
           evaluation: isCorrect ? 1 : 0,
         };
       });
-
-      // console.log("username,exam_type,total_marks,participant_evaluation", username,
-      //   exam_type,
-      //   total_marks,
-      //   participant_evaluation);
 
       const parrticipant_score_save = await makePostApiCall(
         "samcore.samcore_api.save_apptitude_evalution",
