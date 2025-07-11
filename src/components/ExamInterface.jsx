@@ -233,7 +233,7 @@ const ExamInterface = ({ onExamComplete }) => {
       if (selectedExam?.category) {
         try {
           // Pass the category name directly to the API
-          console.log("selectedExam.category",selectedExam.category)
+          // console.log("selectedExam.category",selectedExam.category)
           const fetchedQuestions = await get_exam_apptitude_questions(selectedExam.category);
           // console.log("fetchedQuestions", fetchedQuestions.data.message);
 
@@ -368,10 +368,10 @@ const ExamInterface = ({ onExamComplete }) => {
         };
       });
 
-      console.log("username,exam_type,total_marks,participant_evaluation", username,
-        exam_type,
-        total_marks,
-        participant_evaluation);
+      // console.log("username,exam_type,total_marks,participant_evaluation", username,
+      //   exam_type,
+      //   total_marks,
+      //   participant_evaluation);
 
       const parrticipant_score_save = await makePostApiCall(
         "samcore.samcore_api.save_apptitude_evalution",
@@ -380,18 +380,18 @@ const ExamInterface = ({ onExamComplete }) => {
         }
       );
 
-      console.log("parrticipant_score_save", parrticipant_score_save);
+      // console.log("parrticipant_score_save", parrticipant_score_save);
 
-      console.log("Exam Results:", {
-        results,
-        timeSpent,
-        timeTakenFormatted: formatTimeTaken(timeSpent),
-        violationCount,
-        studentInfo: {
-          id: studentInfo?.studentId,
-          name: studentInfo?.full_name,
-        },
-      });
+      // console.log("Exam Results:", {
+      //   results,
+      //   timeSpent,
+      //   timeTakenFormatted: formatTimeTaken(timeSpent),
+      //   violationCount,
+      //   studentInfo: {
+      //     id: studentInfo?.studentId,
+      //     name: studentInfo?.full_name,
+      //   },
+      // });
       if(parrticipant_score_save.success == true){
         navigate("/results", {
           state: {

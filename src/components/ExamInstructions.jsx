@@ -346,7 +346,7 @@ const ExamInstructions = () => {
   const [selectedExam, setSelectedExam] = useState(null);
 
   const formatTime = (time_of_exam) => {
-    console.log("Raw time_of_exam value:", time_of_exam);
+    // console.log("Raw time_of_exam value:", time_of_exam);
 
     if (!time_of_exam) return "0 minutes";
 
@@ -381,7 +381,7 @@ const ExamInstructions = () => {
     }
 
     // If no format matches, return the original value
-    console.log("No matching time format found, returning original value");
+    // console.log("No matching time format found, returning original value");
     return time_of_exam;
   };
 
@@ -396,11 +396,11 @@ const ExamInstructions = () => {
       if (username) {
         try {
           const get_exam_title = await get_apptitude_exams(username);
-          console.log("get_exam_title", get_exam_title.data.message);
+          // console.log("get_exam_title", get_exam_title.data.message);
           setExamTitles(get_exam_title.data.message);
-          console.log("cetegorystate", cetegorystate);
+          // console.log("cetegorystate", cetegorystate);
           const get_exam_info = await get_exam_apptitude_info(cetegorystate);
-          console.log("get_exam_info", get_exam_info.data.message[0]);
+          // console.log("get_exam_info", get_exam_info.data.message[0]);
           setminimummarks(get_exam_info.data.message[0].minimum_passing_score);
           settime_of_exam(get_exam_info.data.message[0].time_of_exam);
           set_total_marks(get_exam_info.data.message[0].total_marks);
